@@ -1,0 +1,13 @@
+<img style="cover" src="https://picsum.photos/1905/500" alt="">
+
+<div class="m-3">
+  <h1>Films lists</h1>
+
+  <div class="cards mt-3">
+    <% @lists.each do |list| %>
+      <div class="card-category mt-3" style="background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url('<%= list.image_url %>');">
+        <h4><%= link_to list.name, list_path(list) %></h4>
+      </div>
+    <% end %>
+  </div>
+</div>
