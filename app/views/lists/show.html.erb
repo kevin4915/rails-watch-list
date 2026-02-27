@@ -1,21 +1,44 @@
+<img class="banner" src="<%= @list.image_url %>" alt="">
+
 <div class="m-3">
-  <h1><%= @list.name %> list</h1>
-  <div class="d-flex justify-content-around">
-    <% @list.bookmarks.each do |bookmark| %>
-      <div class="card" style="width: 18rem;">
-        <img src="<%= bookmark.movie.poster_url %>" class="card-img-top" alt="...">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="text-decoration-underline">
+      <%= @list.name %> list
+    </h2>
+    <%= link_to "Leave a bookmark", new_list_bookmark_path(@list), class: "btn" %>
+  </div>
+  <div class="movies-cards">
+  <% @list.bookmarks.group_by(&:movie).each do |movie, bookmarks| %>
+      <div class="card">
+        <%= image_tag movie.poster_url, class: "card-img-top movie-poster", alt: movie.title, data: { fallback: asset_path("no_image.png") } %>
         <div class="card-body">
-          <h5 class="card-title"><%= bookmark.movie.title %></h5>
-          <p class="card-text"><%= bookmark.movie.overview %></p>
+          <h5 class="card-title">
+            <strong><%= movie.title %></strong>
+            <% avg = Bookmark.average_for(movie, @list) %>
+            <% if avg.present? %>
+              <span class="ms-2 badge custom-red-badge">
+                ⭐ <%= avg %>
+              </span>
+            <% end %>
+          </h5>
+          <p class="card-text"><%= movie.overview %></p>
+          <% bookmarks.each do |bookmark| %>
+            <div class="mb-3 p-2 border rounded bg-light">
+              <% if bookmark.rating.present? %>
+                <div>
+                    <%= render_stars(bookmark.rating) %>
+                    (<%= bookmark.rating %>/5)
+                </div>
+              <% end %>
+              <p class="mb-1">
+                <strong>Comment:</strong>
+                <%= bookmark.comment %>
+              </p>
+              <%= link_to "", bookmark_path(bookmark), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "fa-solid fa-trash icon-trash small" %>
+            </div>
+          <% end %>
         </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <strong>Commentaire:</strong> <%= bookmark.comment %>
-            <%= link_to "", bookmark_path(bookmark), data: {turbo_method: :delete, turbo_confirm: "Are you sure?"}, class:"fa-solid fa-trash" %>
-          </li>
-        </ul>
       </div>
     <% end %>
   </div>
-  <%= link_to "Leave a bookmark", new_list_bookmark_path(@list), class: "btn btn-primary mt-3" %>
 </div>
